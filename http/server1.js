@@ -12,15 +12,27 @@ server.on('request',(req,res)=>{
     if (req.method === 'GET' && parsedUrl.pathname === '/metadata'){
         const { id } = parsedUrl.query;
         const metadata = sevices.fetchImageMetadata(id);
-        console.log(metadata);
-    };
+        response.setHeader('Content-Type','application/json');
+        response.statusCode = 200;
+        const serializedJSON = JSON.stringify(metadata);
+        response.write(serializedJSON);
+        response.end();
+    } else if(http.request.method==='POST' && parsedUrl.pathname==='/users'){
     jsonBody(req,res,(err,body)=>{
         if(err){
             console.log(err);
         }else{
             services.createUser(body['username']);
         }
-    })
+    });
+    } else {
+        //response.statusCode = 404;
+        //response.setHeader('X-Powered-By','Node');
+        response.writehead(404,{
+            'X-powered-By' : 'Node'
+        });
+        response.end();
+    }
 });
 
 server.listen(8080);
