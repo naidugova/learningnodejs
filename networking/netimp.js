@@ -2,6 +2,11 @@ const server = require('net').createServer();
 let counter = 0;
 let sockets = {};
 
+function timestamp(){
+    const now = new Date();
+    return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+}
+
 server.on('connection', socket => {
   socket.id = counter++;
 
@@ -16,14 +21,14 @@ server.on('connection', socket => {
           sockets[socket.id] = socket;
           Object.entries(sockets).forEach(([sid, cs]) => {
             if (sid != socket.id) {
-              cs.write(`${socket.name}: Is on the chat\n`);
+              cs.write(`${socket.name} ${timestamp()}: Is on the chat\n`);
             }
           });
           return;
       }
     Object.entries(sockets).forEach(([sid, cs]) => {
       if (sid != socket.id) {
-        cs.write(`${socket.name}: `);
+        cs.write(`${socket.name} ${timestamp()}: `);
         cs.write(data);
       }
     });
@@ -32,7 +37,7 @@ server.on('connection', socket => {
   socket.on('end', () => {
     delete sockets[socket.id];
     Object.entries(sockets).forEach(([, cs]) => {
-        cs.write(`${socket.name}: Is disconnected\n`);
+        cs.write(`${socket.name} ${timestamp()}: Is disconnected\n`);
       });
     console.log('Client disconnected');
   });
